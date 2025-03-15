@@ -1,25 +1,18 @@
 import { useState, useEffect } from "react";
-import { apiRequest } from "../utils/api";
 import { Link } from "react-router-dom";
-
-// Define a TypeScript interface for notes
-interface Note {
-  id: number;
-  title: string;
-  content: string;
-  created_at: string;
-}
-
+import { Note } from "../types/note";
+import { apiRequest } from "../utils/api";
 export default function Dashboard() {
   // Define state with proper type
   const [notes, setNotes] = useState<Note[]>([]);
 
-  // TODO: Add back in when connected to backend
-  /*
+  //Todo: add back in when connected to backend
+  /* 
   useEffect(() => {
-    apiRequest("http://127.0.0.1:8000/notes").then((data) => setNotes(data || []));
+    apiRequeest("http://127.0.0.1:8000/notes").then((data: Note[]) => setNotes(data) || []));
   }, []);
-*/
+  */
+
 
   const deleteNote = async (id: number) => {
     const response = await fetch(`http://127.0.0.1:8000/notes/${id}`, { method: "DELETE" });
@@ -29,6 +22,7 @@ export default function Dashboard() {
   };
   
 
+  //Fetch all notes when component mounts
   useEffect(() => {
     fetch("http://127.0.0.1:8000/notes")
       .then((res) => res.json())
@@ -68,14 +62,3 @@ export default function Dashboard() {
     </div>
   );
 }
-
-
-/*
-<div key={note.id} className="p-4 bg-white rounded shadow hover:shadow-lg transition">
-  <h3 className="font-bold text-lg text-blue-600">{note.title}</h3>
-  <p className="text-gray-600 text-sm">
-    {note.content.length > 100 ? note.content.substring(0, 100) + "..." : note.content}
-  </p>
-  <p className="text-xs text-gray-400 mt-2">Created on: {new Date().toLocaleDateString()}</p>
-</div>
-*/

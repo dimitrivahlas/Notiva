@@ -1,19 +1,16 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-
-interface Note {
-  id: number;
-  title: string;
-  content: string;
-}
+import { Note } from "../types/note";
 
 export default function NoteEditor() {
-  const { id } = useParams(); // Get note ID from URL
+  const { id } = useParams(); // Get note ID from URL parameters for edit mode
   const navigate = useNavigate();
 
+  //state management for form fields
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
 
+  //Load existing note data when editing when id is present
   useEffect(() => {
     if (id) {
       fetch(`http://127.0.0.1:8000/notes/${id}`)
@@ -26,6 +23,7 @@ export default function NoteEditor() {
     }
   }, [id]);
 
+  //handle Note Creation and update
   const saveNote = async () => {
     const method = id ? "PUT" : "POST";
     const url = id ? `http://127.0.0.1:8000/notes/${id}` : "http://127.0.0.1:8000/notes";
@@ -37,7 +35,7 @@ export default function NoteEditor() {
     });
 
     if (response.ok) {
-      navigate("/");
+      navigate("/"); //Navigate back to dashboard after saving
     }
   };
 
