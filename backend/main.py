@@ -12,7 +12,7 @@ Base.metadata.create_all(bind=engine)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5174"],  # ✅ Allow frontend access
+    allow_origins=["http://localhost:5174", "http://localhost:5173"],  # ✅ Allow frontend access
     allow_credentials=True,
     allow_methods=["*"],  # ✅ Allow all HTTP methods (GET, POST, PUT, DELETE)
     allow_headers=["*"],  # ✅ Allow all headers

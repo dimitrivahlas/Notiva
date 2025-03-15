@@ -25,17 +25,32 @@ export default function NoteEditor() {
 
   //handle Note Creation and update
   const saveNote = async () => {
-    const method = id ? "PUT" : "POST";
-    const url = id ? `http://127.0.0.1:8000/notes/${id}` : "http://127.0.0.1:8000/notes";
+    try {
+      const method = id ? "PUT" : "POST";
+      let url = id ? `http://127.0.0.1:8000/notes/${id}` : "http://127.0.0.1:8000/notes";
+      
+      // For POST requests, append query parameters
+      if (!id) {
+        url += `?title=${encodeURIComponent(title)}&content=${encodeURIComponent(content)}`;
+      }
 
-    const response = await fetch(url, {
-      method,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title, content }),
-    });
+      const response = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        // Only include body for PUT requests
+        ...(id && { body: JSON.stringify({ title, content }) }),
+      });
 
-    if (response.ok) {
-      navigate("/"); //Navigate back to dashboard after saving
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('Note saved:', data);
+      navigate("/"); // Navigate back to dashboard after saving
+    } catch (error) {
+      console.error('Error saving note:', error);
+      alert('Failed to save note. Please try again.');
     }
   };
 
