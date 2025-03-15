@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { apiRequest } from "../utils/api";
 import { Link } from "react-router-dom";
 
 // Define a TypeScript interface for notes
@@ -12,6 +13,10 @@ interface Note {
 export default function Dashboard() {
   // Define state with proper type
   const [notes, setNotes] = useState<Note[]>([]);
+
+  useEffect(() => {
+    apiRequest("http://127.0.0.1:8000/notes").then((data) => setNotes(data || []));
+  }, []);
 
   const deleteNote = async (id: number) => {
     const response = await fetch(`http://127.0.0.1:8000/notes/${id}`, { method: "DELETE" });
