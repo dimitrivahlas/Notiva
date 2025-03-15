@@ -6,6 +6,7 @@ interface Note {
   id: number;
   title: string;
   content: string;
+  created_at: string;
 }
 
 export default function Dashboard() {
@@ -37,9 +38,10 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
           {notes.length > 0 ? (
             notes.map((note) => (
-              <div key={note.id} className="p-4 bg-white rounded shadow">
-                <h3 className="font-bold">{note.title}</h3>
-                <p>{note.content}</p>
+              <div key={note.id} className="p-4 bg-white rounded shadow hover:shadow-lg transition">
+                <h3 className="font-bold text-lg text-blue-600">{note.title}</h3>
+                <p className="text-gray-600 text-sm">{note.content.length > 100 ? note.content.substring(0, 100) + "..." : note.content}</p>
+                <p className="text-xs text-gray-400 mt-2">Created on: {new Date().toLocaleDateString()}</p>
                 <div className="mt-2 flex gap-2">
                   <Link to={`/editor/${note.id}`} className="bg-yellow-500 text-white px-2 py-1 rounded">
                     Edit
@@ -59,3 +61,13 @@ export default function Dashboard() {
   );
 }
 
+
+/*
+<div key={note.id} className="p-4 bg-white rounded shadow hover:shadow-lg transition">
+  <h3 className="font-bold text-lg text-blue-600">{note.title}</h3>
+  <p className="text-gray-600 text-sm">
+    {note.content.length > 100 ? note.content.substring(0, 100) + "..." : note.content}
+  </p>
+  <p className="text-xs text-gray-400 mt-2">Created on: {new Date().toLocaleDateString()}</p>
+</div>
+*/

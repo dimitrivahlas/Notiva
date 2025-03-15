@@ -10,6 +10,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/editor" element={<NoteEditor />} />
+        <Route path="/editor/:id" element={<NoteEditor />} />
       </Routes>
     </div>
   );
