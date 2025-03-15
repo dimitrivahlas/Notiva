@@ -1,0 +1,15 @@
+# Node modules (Frontend)
+frontend/node_modules/
+frontend/.vite/
+
+# Python environment (Backend)
+backend/__pycache__/
+backend/venv/
+backend/.env
+
+# Logs and OS Files
+*.log
+.DS_Store
+.env
+.idea/
+.vscode/
