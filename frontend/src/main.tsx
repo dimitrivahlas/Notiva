@@ -1,16 +1,18 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.tsx'
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
+import App from "./App.tsx";
+import "./index.css";
 
-// Safer way to get root element
-const rootElement = document.getElementById('root');
+const rootElement = document.getElementById("root");
 
 if (rootElement) {
   createRoot(rootElement).render(
     <StrictMode>
-      <App />
-    </StrictMode>,
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </StrictMode>
   );
 } else {
   console.error("Root element #root not found!");
