@@ -13,3 +13,6 @@ backend/.env
 .env
 .idea/
 .vscode/
+# Ignore SQLite database file
+backend/notiva.db
+backend/__pycache__/
