@@ -1,7 +1,7 @@
 import { Routes, Route } from "react-router-dom";
-import Dashboard from "./pages/Dashboard";
-import NoteEditor from "./pages/NoteEditor";
-import Navbar from "./components/Navbar";
+import Dashboard from "./pages/Dashboard.tsx";
+import NoteEditor from "./pages/NoteEditor.tsx";
+import Navbar from "./components/Navbar.tsx";
 
 export default function App() {
   return (
