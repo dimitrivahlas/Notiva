@@ -1,1 +1,1 @@
-# This is a note taking app forrreall twin
+# This is a note taking app 
