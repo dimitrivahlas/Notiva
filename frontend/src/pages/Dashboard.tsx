@@ -2,33 +2,64 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Note } from "../types/note";
 import { apiRequest } from "../utils/api";
+import { summarizeText } from "../utils/aiSummarizer";
+
 export default function Dashboard() {
-  // Define state with proper type
   const [notes, setNotes] = useState<Note[]>([]);
-
-  //Todo: add back in when connected to backend
-  /* 
-  useEffect(() => {
-    apiRequeest("http://127.0.0.1:8000/notes").then((data: Note[]) => setNotes(data) || []));
-  }, []);
-  */
-
+  const [summaries, setSummaries] = useState<{ [key: number]: string }>({});
+  const [error, setError] = useState<string | null>(null);
 
   const deleteNote = async (id: number) => {
-    const response = await fetch(`http://127.0.0.1:8000/notes/${id}`, { method: "DELETE" });
-    if (response.ok) {
-      setNotes(notes.filter((note) => note.id !== id)); // Update UI after deleting
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/notes/${id}`, { method: "DELETE" });
+      if (response.ok) {
+        setNotes(notes.filter((note) => note.id !== id));
+      } else {
+        throw new Error(`Failed to delete note: ${response.statusText}`);
+      }
+    } catch (error) {
+      console.error("Delete error:", error);
+      alert("Failed to delete note");
     }
   };
-  
 
-  //Fetch all notes when component mounts
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/notes")
-      .then((res) => res.json())
-      .then((data: Note[]) => setNotes(data)) // Specify expected response type
-      .catch((error) => console.error("Error fetching notes:", error));
+    const fetchNotes = async () => {
+      try {
+        const response = await fetch("http://127.0.0.1:8000/notes/");
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setNotes(data);
+
+        // Generate summaries
+        const summaryMap: { [key: number]: string } = {};
+        for (const note of data) {
+          if (note.content) {
+            try {
+              summaryMap[note.id] = await summarizeText(note.content);
+            } catch (err) {
+              console.error(`Failed to summarize note ${note.id}:`, err);
+              summaryMap[note.id] = note.content.split(/[.!?]+/)[0];
+            }
+          } else {
+            summaryMap[note.id] = "Empty note";
+          }
+        }
+        setSummaries(summaryMap);
+      } catch (error) {
+        console.error("Error fetching notes:", error);
+        setError("Failed to load notes");
+      }
+    };
+
+    fetchNotes();
   }, []);
+
+  if (error) {
+    return <div className="p-4 text-red-500">{error}</div>;
+  }
 
   return (
     <div>
@@ -40,10 +71,11 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
           {notes.length > 0 ? (
             notes.map((note) => (
-              <div key={note.id} className="p-4 bg-white rounded shadow hover:shadow-lg transition">
+              <div key={note.id} className="p-4 bg-white rounded shadow">
                 <h3 className="font-bold text-lg text-blue-600">{note.title}</h3>
-                <p className="text-gray-600 text-sm">{note.content.length > 100 ? note.content.substring(0, 100) + "..." : note.content}</p>
-                <p className="text-xs text-gray-400 mt-2">Created on: {new Date().toLocaleDateString()}</p>
+                <p className="text-gray-600 text-sm mt-2">
+                  {summaries[note.id] || "Generating AI summary..."}
+                </p>
                 <div className="mt-2 flex gap-2">
                   <Link to={`/editor/${note.id}`} className="bg-green-500 text-white px-2 py-1 rounded">
                     View
@@ -62,4 +94,3 @@ export default function Dashboard() {
     </div>
   );
 }
-

@@ -8,6 +8,19 @@ from schemas import NoteCreate, NoteUpdate
 
 router = APIRouter(prefix="/notes", tags=["Notes"])
 
+@router.get("/")
+def get_notes(db: Session = Depends(get_db)):
+    return db.query(Note).all()
+
+class TextInput(BaseModel):
+    text: str
+
+@router.post("/summarize")
+async def summarize_text(input: TextInput):
+    # For now, return a simple summary (first 100 characters)
+    # You can replace this with actual AI summarization later
+    summary = input.text[:100] + "..." if len(input.text) > 100 else input.text
+    return {"summary": summary}
 
 @router.post("/", response_model=NoteCreate)
 def create_note(note_data: NoteCreate, db: Session = Depends(get_db)):
