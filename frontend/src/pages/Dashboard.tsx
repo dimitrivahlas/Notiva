@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Note } from "../types/note";
 import { apiRequest } from "../utils/api";
 import { summarizeText } from "../utils/aiSummarizer";
@@ -8,6 +8,8 @@ export default function Dashboard() {
   const [notes, setNotes] = useState<Note[]>([]);
   const [summaries, setSummaries] = useState<{ [key: number]: string }>({});
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const location = useLocation();
 
   const generateSummary = async (note: Note) => {
     if (!note.content) return "Empty note";
@@ -40,28 +42,31 @@ export default function Dashboard() {
     }
   };
 
-  useEffect(() => {
-    const fetchNotes = async () => {
-      try {
-        const response = await fetch("http://127.0.0.1:8000/notes/");
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        setNotes(data);
-
-        // Generate summaries asynchronously
-        data.forEach((note: Note) => {
-          generateSummary(note);
-        });
-      } catch (error) {
-        console.error("Error fetching notes:", error);
-        setError("Failed to load notes");
+  const fetchNotes = async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch("http://127.0.0.1:8000/notes/");
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-    };
+      const data = await response.json();
+      setNotes(data);
 
+      // Generate summaries asynchronously
+      data.forEach((note: Note) => {
+        generateSummary(note);
+      });
+    } catch (error) {
+      console.error("Error fetching notes:", error);
+      setError("Failed to load notes");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchNotes();
-  }, []);
+  }, [location.key]); // Refetch when location changes (i.e., after navigation)
 
   if (error) {
     return <div className="p-4 text-red-500">{error}</div>;
@@ -75,7 +80,14 @@ export default function Dashboard() {
           New Note
         </Link>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-          {notes.length > 0 ? (
+          {isLoading ? (
+            <div className="col-span-2 text-center py-4">
+              <svg className="animate-spin h-8 w-8 text-blue-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            </div>
+          ) : notes.length > 0 ? (
             notes.map((note) => (
               <div key={note.id} className="p-4 bg-white rounded shadow">
                 <h3 className="font-bold text-lg text-blue-600">{note.title}</h3>

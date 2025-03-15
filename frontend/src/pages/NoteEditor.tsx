@@ -72,7 +72,7 @@ export default function NoteEditor() {
       />
       <textarea
         placeholder="Write your note here..."
-        className="border p-2 w-3/4 h-64 mb-2 rounded resize-none"
+        className="border p-2 w-3/4 h-96 mb-2 rounded resize-none"
         value={content}
         onChange={(e) => setContent(e.target.value)}
       />
